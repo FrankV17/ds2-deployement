@@ -1,9 +1,12 @@
-FROM nginx:alpine
+FROM python:3.12-slim
 
-RUN rm -rf /usr/share/nginx/html/*
+WORKDIR /app
 
-COPY app/ /usr/share/nginx/html/
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 80
+COPY . .
 
-CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 8000
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

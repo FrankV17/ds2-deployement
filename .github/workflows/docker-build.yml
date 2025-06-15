@@ -45,3 +45,32 @@ jobs:
         run: |
           docker stop test-container
           docker rm test-container
+
+  deploy:
+    name: Deploy to Remote VM
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Copy files via SSH
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          source: "."
+          target: "~/hello-deploy"
+
+      - name: Run docker-compose on VM
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            cd ~/hello-deploy
+            docker-compose down
+            docker-compose up -d --build

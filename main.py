@@ -1,7 +1,9 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+# Allow all CORS origins for demo
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -9,7 +11,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-def read_root():
-    return {"message": "Hello, World!"}
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
+@app.get("/")
+def hello():
+    return {"message": "Hello World from Digital Systems 2 Deployment Project!"}
